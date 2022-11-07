@@ -2156,7 +2156,7 @@ function Library:CreateWindow(Info)
         BackgroundColor3 = Library.Black,
         BorderSizePixel = 0,
         AnchorPoint = Info.Centered and Vector2.new(0.5, 0.5) or Vector2.new(0, 0),
-        Position = Info.Centered and UDim2.fromScale(0.5, 0.5) or UDim2.new(0, 175, 0, 50),
+        Position = Info.Centered and UDim2.new(0.5, 5, 0.5, 2) or UDim2.new(0, 175, 0, 50),
         Size = UDim2.new(0, 528, 0, 578),
         Parent = ScreenGui,
         ZIndex = 1;
