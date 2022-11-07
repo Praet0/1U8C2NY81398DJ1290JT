@@ -225,13 +225,11 @@ function Library:UpdateColorsUsingRegistry()
     -- The above would be especially efficient for a rainbow menu color or live color-changing.
 
     for Idx, Object in next, Library.Registry do
-        if Library.Window and Object.Instance:IsDescendantOf(Library.Window) and Library.Window.Visible or Library.Window and not Object.Instance:IsDescendantOf(Library.Window) then
-            for Property, ColorIdx in next, Object.Properties do
-                if type(ColorIdx) == 'string' then
-                    Object.Instance[Property] = ColorIdx == 'AccentColor' and GetAccentColor() or ColorIdx == 'DarkerAccentColor' and Library:GetDarkerColor(GetAccentColor()) or Library[ColorIdx]
-                elseif type(ColorIdx) == 'function' then
-                    Object.Instance[Property] = ColorIdx()
-                end
+        for Property, ColorIdx in next, Object.Properties do
+            if type(ColorIdx) == 'string' then
+                Object.Instance[Property] = ColorIdx == 'AccentColor' and GetAccentColor() or ColorIdx == 'DarkerAccentColor' and Library:GetDarkerColor(GetAccentColor()) or Library[ColorIdx]
+            elseif type(ColorIdx) == 'function' then
+                Object.Instance[Property] = ColorIdx()
             end
         end
     end
