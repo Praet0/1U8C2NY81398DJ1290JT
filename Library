@@ -304,11 +304,11 @@ do
         local Hovering = false
         HoverRegion.MouseEnter:connect(function()
             Hovering = true
-            Tooltip.Visible = not Library:MouseIsOverOpenedFrame()
+            Tooltip.Visible = not Library:MouseIsOverOpenedFrame() and Library.Window.Visible
 
             while Hovering do
                 RunService.Heartbeat:Wait()
-                if not Library:MouseIsOverOpenedFrame() then
+                if not Library:MouseIsOverOpenedFrame() and Library.Window.Visible then
                     if Hovering then
                         Tooltip.Visible = true
                         Tooltip.Position = UDim2.new(0, Mouse.X + 15, 0, Mouse.Y)
@@ -2694,6 +2694,7 @@ function Library:CreateWindow(Info)
     end))
 
     if Info.AutoShow then task.spawn(Library.Toggle) task.spawn(Library.Toggle) end 
+    Library.Window = Outer
 
     return Window
 end
