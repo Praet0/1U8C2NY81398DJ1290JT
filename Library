@@ -1141,7 +1141,7 @@ do
             {BorderColor3 = 'Black'}
         )
 
-        ButtonLabel.InputBegan:connect(function(Input)
+        ButtonOuter.InputBegan:connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Library:MouseIsOverOpenedFrame() then
                 CallBack()
             end
