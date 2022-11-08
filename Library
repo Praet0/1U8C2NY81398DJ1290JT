@@ -430,6 +430,7 @@ do
             KeyPicker.Value = Key
             KeyPicker.Mode = Mode
             KeyPicker:Update()
+            DisplayLabel.Text = Key
         end
 
         function KeyPicker:GetState()
