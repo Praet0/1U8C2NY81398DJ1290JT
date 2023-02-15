@@ -1,5 +1,6 @@
 -- Version 6b
 -- Updates:
+-- Removed Active Checker due to performance degration 
 -- Added ClearTextOnFocus option for Inputbox
 
 local UIS = game:GetService('UserInputService')
@@ -1321,7 +1322,7 @@ do
 
             Position = UDim2.fromOffset(0, 0),
             Size = UDim2.fromScale(5, 1),
-            
+
             ClearTextOnFocus = Info.ClearTextOnFocus or true
             Font = Enum.Font.Code;
             PlaceholderColor3 = Color3.fromRGB(190, 190, 190);
