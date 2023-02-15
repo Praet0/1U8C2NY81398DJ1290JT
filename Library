@@ -1292,6 +1292,7 @@ do
             Size = UDim2.fromScale(5, 1),
 
             ClearTextOnFocus = Info.ClearTextOnFocus or true;
+            print(ClearTextOnFocus)
             Font = Enum.Font.Code;
             PlaceholderColor3 = Color3.fromRGB(190, 190, 190);
             PlaceholderText = Info.Placeholder or '';
