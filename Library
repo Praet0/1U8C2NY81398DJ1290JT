@@ -1,6 +1,7 @@
--- Version 6a
+-- Version 6b
 -- Updates:
--- Added Active Checker for performance improvement so inactive (hidden) UIs don't get their Color updated for no reason
+-- Removed Active Checker due to performance degration
+-- Added ClearTextOnFocus option for Inputbox
 
 local UIS = game:GetService('UserInputService')
 local TextService = game:GetService('TextService');
@@ -39,7 +40,6 @@ local Library = {
     White = Color3.fromRGB(255,255,255),
 
     OpenedFrames = {},
-    Active = {},
 
     Signals = {},
     ScreenGui = ScreenGui,
@@ -200,35 +200,8 @@ function Library:AddToRegistry(Instance, Properties)
         Idx = Idx,
     }
 
-    local function OnChanged (Visible)
-        if Visible then
-            if Library.RegistryMap[Instance] then 
-                table.insert(Library.Active, Instance)
-            end
-            for i,v in pairs (Instance:GetDescendants()) do
-                if Library.RegistryMap[v] and Library.Active[v] == nil then 
-                    table.insert(Library.Active, v)
-                end
-            end
-        else
-            local Idx = table.find(Library.Active, Instance)
-            if Idx then 
-                table.remove(Library.Active, Idx)
-            end
-            for i,v in pairs (Instance:GetDescendants()) do
-                local Id = table.find(Library.Active, v)
-                if Id then 
-                    table.remove(Library.Active, Id)
-                end
-            end
-        end
-    end
-
-    table.insert(Library.Active, Instance)
     table.insert(Library.Registry, Data)
     Library.RegistryMap[Instance] = Data
-
-    return OnChanged
 end
 
 function Library:RemoveFromRegistry(Instance)
@@ -257,13 +230,11 @@ function Library:UpdateColorsUsingRegistry()
     -- The above would be especially efficient for a rainbow menu color or live color-changing.
 
     for Idx, Object in next, Library.Registry do
-        if table.find(Library.Active, Object.Instance) then
-            for Property, ColorIdx in next, Object.Properties do
-                if type(ColorIdx) == 'string' then
-                    Object.Instance[Property] = ColorIdx == 'AccentColor' and GetAccentColor() or ColorIdx == 'DarkerAccentColor' and Library:GetDarkerColor(GetAccentColor()) or Library[ColorIdx]
-                elseif type(ColorIdx) == 'function' then
-                    Object.Instance[Property] = ColorIdx()
-                end
+        for Property, ColorIdx in next, Object.Properties do
+            if type(ColorIdx) == 'string' then
+                Object.Instance[Property] = ColorIdx == 'AccentColor' and GetAccentColor() or ColorIdx == 'DarkerAccentColor' and Library:GetDarkerColor(GetAccentColor()) or Library[ColorIdx]
+            elseif type(ColorIdx) == 'function' then
+                Object.Instance[Property] = ColorIdx()
             end
         end
     end
@@ -321,7 +292,7 @@ do
             Visible = false,
         })
 
-        local VTracker = Library:AddToRegistry(Tooltip, {
+        Library:AddToRegistry(Tooltip, {
             BorderColor3 = 'OutlineColor',
         })
 
@@ -339,7 +310,7 @@ do
         HoverRegion.MouseEnter:connect(function()
             Hovering = true
             Tooltip.Visible = not Library:MouseIsOverOpenedFrame() and Library.Window.Visible
-            VTracker(true)
+
             while Hovering do
                 RunService.Heartbeat:Wait()
                 if not Library:MouseIsOverOpenedFrame() and Library.Window.Visible then
@@ -356,7 +327,6 @@ do
         HoverRegion.MouseLeave:connect(function()
             Hovering = false
             Tooltip.Visible = false
-            VTracker(false)
         end)
     end
 
@@ -465,6 +435,7 @@ do
             KeyPicker.Value = Key
             KeyPicker.Mode = Mode
             KeyPicker:Update()
+            DisplayLabel.Text = Key
         end
 
         function KeyPicker:GetState()
@@ -780,7 +751,7 @@ do
         });
 
 
-        ColorPicker.VTracker = Library:AddToRegistry(PickerFrameInner, { BackgroundColor3 = 'BackgroundColor'; BorderColor3 = 'OutlineColor'; });
+        Library:AddToRegistry(PickerFrameInner, { BackgroundColor3 = 'BackgroundColor'; BorderColor3 = 'OutlineColor'; });
         Library:AddToRegistry(Highlight, { BackgroundColor3 = 'AccentColor'; });
         Library:AddToRegistry(SatVibMapInner, { BackgroundColor3 = 'BackgroundColor'; BorderColor3 = 'OutlineColor'; });
 
@@ -857,13 +828,11 @@ do
             end;
 
             PickerFrameOuter.Visible = true;
-            ColorPicker.VTracker(true)
             Library.OpenedFrames[PickerFrameOuter] = true;
         end;
 
         function ColorPicker:Hide()
             PickerFrameOuter.Visible = false;
-            ColorPicker.VTracker(false)
             Library.OpenedFrames[PickerFrameOuter] = nil;
         end;
 
@@ -1846,7 +1815,7 @@ do
 
         local ItemList = Library:CreateLabel({
             Position = UDim2.new(0, 5, 0, 0);
-            Size = UDim2.new(1, -5, 1, 0);
+            Size = UDim2.new(1, -18, 1, 0);
             TextSize = 14;
             Text = '--';
             TextXAlignment = Enum.TextXAlignment.Left;
@@ -1900,7 +1869,7 @@ do
             ScrollBarImageColor3 = Library.AccentColor, 
         });
 
-        Dropdown.VCheck = Library:AddToRegistry(Scrolling, {
+        Library:AddToRegistry(Scrolling, {
             ScrollBarImageColor3 = 'AccentColor'
         })
 
@@ -2071,14 +2040,12 @@ do
             ListOuter.Visible = true;
             Library.OpenedFrames[ListOuter] = true;
             DropdownArrow.Rotation = 180;
-            Dropdown.VCheck(true)
         end;
 
         function Dropdown:CloseDropdown()
             ListOuter.Visible = false;
             Library.OpenedFrames[ListOuter] = nil;
             DropdownArrow.Rotation = 0;
-            Dropdown.VCheck(false)
         end;
 
         function Dropdown:OnChanged(Func)
@@ -2215,7 +2182,7 @@ function Library:CreateWindow(Info)
         Parent = Outer,
     })
 
-    Window.VCheck = Library:AddToRegistry(Inner, {
+    Library:AddToRegistry(Inner, {
         BackgroundColor3 = 'MainColor',
         BorderColor3 = 'AccentColor',
     })
@@ -2341,7 +2308,7 @@ function Library:CreateWindow(Info)
             Parent = TabContainer,
         })
 
-        Tab.VCheck = Library:AddToRegistry(TabFrame, {
+        Library:AddToRegistry(TabFrame, {
             BackgroundColor3 = 'MainColor',
             BorderColor3 = 'OutlineColor',
         })
@@ -2381,7 +2348,6 @@ function Library:CreateWindow(Info)
             TabButton.BackgroundColor3 = Library.BackgroundColor
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'BackgroundColor'
             TabFrame.Visible = false
-            Tab.VCheck(false)
         end
 
         function Tab:ShowTab()
@@ -2393,7 +2359,6 @@ function Library:CreateWindow(Info)
             TabButton.BackgroundColor3 = Library.MainColor
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'MainColor'
             TabFrame.Visible = true
-            Tab.VCheck(true)
         end;
 
         function Tab:AddGroupbox(Info)
@@ -2708,8 +2673,7 @@ function Library:CreateWindow(Info)
     function Library.Toggle()
         Outer.Visible = not Outer.Visible;
         ModalElement.Modal = Outer.Visible;
-        Window.VCheck(Outer.Visible)
-        
+
         local Cursor = Drawing.new('Triangle');
         Cursor.Thickness = 1;
         Cursor.Filled = true;
@@ -2777,7 +2741,7 @@ do
         Parent = WatermarkOuter,
     })
 
-    local WMVCheck = Library:AddToRegistry(WatermarkInner, {
+    Library:AddToRegistry(WatermarkInner, {
         BackgroundColor3 = 'MainColor',
         BorderColor3 = 'AccentColor',
     })
@@ -2849,7 +2813,6 @@ do
     Library.WatermarkFrame = WatermarkOuter
     Library.WatermarkLabel = WatermarkLabel
     Library.WatermarkText = ''
-    Library.WatermarkVCheck = WMVCheck
     Library:MakeDraggable(WatermarkOuter, 20) 
 
 
@@ -2872,7 +2835,7 @@ do
         Parent = KeybindOuter;
     });
 
-    local KBVCheck = Library:AddToRegistry(KeybindInner, {
+    Library:AddToRegistry(KeybindInner, {
         BackgroundColor3 = 'MainColor';
         BorderColor3 = 'OutlineColor';
     });
@@ -2918,18 +2881,15 @@ do
 
     Library.KeybindFrame = KeybindOuter;
     Library.KeybindContainer = KeybindContainer;
-    Library.KeybindVCheck = KBVCheck
     Library:MakeDraggable(KeybindOuter, 20); 
 end
 
 function Library:SetKeybindListVisibility(Bool)
     Library.KeybindFrame.Visible = Bool;
-    Library.KeybindVCheck(Bool)
 end;
 
 function Library:SetWatermarkVisibility(Bool)
     Library.WatermarkFrame.Visible = Bool;
-    Library.WatermarkVCheck(Bool)
 end;
 
 function Library:SetWatermark(Text)
