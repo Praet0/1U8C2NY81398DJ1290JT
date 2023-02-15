@@ -1291,8 +1291,7 @@ do
             Position = UDim2.fromOffset(0, 0),
             Size = UDim2.fromScale(5, 1),
 
-            ['ClearTextOnFocus'] = Info.ClearTextOnFocus or true;
-          
+
             Font = Enum.Font.Code;
             PlaceholderColor3 = Color3.fromRGB(190, 190, 190);
             PlaceholderText = Info.Placeholder or '';
@@ -1306,6 +1305,7 @@ do
             ZIndex = 7;
             Parent = TextBoxContainer;
         });
+        Box.ClearTextOnFocus = Info.ClearTextOnFocus or true;
  print(Box.ClearTextOnFocus, Info.ClearTextOnFocus)
         Library:AddToRegistry(Box, {
             TextColor3 = 'FontColor';
