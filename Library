@@ -523,7 +523,7 @@ do
         KeyPicker:Update()
 
         Library:GiveSignal(UIS.InputBegan:Connect(function(Input, Processed)
-            if not Processed and not Picking then
+            if not Picking then
                 local Key = GetInputKey(Input)
                 if Key == KeyPicker.Value then
                     if KeyPicker.Mode == "Hold" then
