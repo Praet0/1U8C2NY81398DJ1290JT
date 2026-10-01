@@ -2314,16 +2314,32 @@ function Library:CreateWindow(Info)
             BorderColor3 = 'OutlineColor',
         })
 
-        local LeftSide = Library:Create('Frame', {
+        local LeftSide = Library:Create('ScrollingFrame', {
             BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Active = true,
+            ClipsDescendants = true,
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            ScrollingDirection = Enum.ScrollingDirection.Y,
+            BottomImage = '',
+            TopImage = '',
+            ScrollBarThickness = 0,
             Size = UDim2.new(0.5, -15, 0, 471),
             Position = UDim2.new(0, 10, 0, 11),
             ZIndex = 2;
             Parent = TabFrame,
         })
 
-        local RightSide = Library:Create('Frame', {
+        local RightSide = Library:Create('ScrollingFrame', {
             BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Active = true,
+            ClipsDescendants = true,
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            ScrollingDirection = Enum.ScrollingDirection.Y,
+            BottomImage = '',
+            TopImage = '',
+            ScrollBarThickness = 0,
             Size = UDim2.new(0.5, -15, 0, 471),
             Position = UDim2.new(0.5, 5, 0, 11),
             ZIndex = 2;
@@ -2343,6 +2359,19 @@ function Library:CreateWindow(Info)
             SortOrder = Enum.SortOrder.LayoutOrder,
             Parent = RightSide,
         })
+
+        -- Match the reference library: each column scrolls when its sections
+        -- exceed the visible height, and follows changes to section sizes.
+        for _, Side in next, { LeftSide, RightSide } do
+            local Layout = Side:WaitForChild('UIListLayout');
+
+            local function UpdateCanvasSize()
+                Side.CanvasSize = UDim2.fromOffset(0, Layout.AbsoluteContentSize.Y);
+            end;
+
+            Layout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(UpdateCanvasSize);
+            UpdateCanvasSize();
+        end;
 
         function Tab:HideTab()
             Blocker.BackgroundTransparency = 1
